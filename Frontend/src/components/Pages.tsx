@@ -1,10 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BingoGrid from "./BingoGrid";
+import LoginDialog from "./LoginDialog";
 
 export const Home: React.FC = () => {
   const [fields, setFields] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"meeting" | "lecture">("meeting");
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/auth/me", {
+      credentials: "include",
+    })
+      .then(async (res) => {
+        if (res.ok) {
+          const data = await res.json();
+          setUsername(data.username);
+        } else {
+          setUsername(null);
+        }
+      })
+      .catch(() => setUsername(null));
+  }, []);
 
   const handleModeChange = (newMode: "meeting" | "lecture") => {
     setMode(newMode);
@@ -25,13 +42,20 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <BingoGrid
-      fields={fields}
-      onNewGame={handleNewGame}
-      loading={loading}
-      mode={mode}
-      onModeChange={handleModeChange}
-    />
+    <div className="flex flex-col items-center w-full">
+      {username && (
+        <div className="text-xl font-bold mb-4 text-blue-700">
+          Hello {username}
+        </div>
+      )}
+      <BingoGrid
+        fields={fields}
+        onNewGame={handleNewGame}
+        loading={loading}
+        mode={mode}
+        onModeChange={handleModeChange}
+      />
+    </div>
   );
 };
 
@@ -55,3 +79,5 @@ export const Pricing: React.FC = () => (
     <p>See our pricing options.</p>
   </div>
 );
+
+export const Login: React.FC = () => <LoginDialog></LoginDialog>;

@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { About, Contact, Home, Pricing } from './components/Pages'
+import { About, Contact, Home, Login, Pricing } from './components/Pages'
+import { Profile } from './components/Profile' 
 import { Navbar } from './components/Navbar'
+import { GameLobby } from './components/GameLobby'
+import { GamePlay } from './components/GamePlay'
 
 function App() {
   return (
@@ -13,6 +16,10 @@ function App() {
             <Route path='/about' element={<About />} />
             <Route path='/pricing' element={<Pricing />} />
             <Route path='/contact' element={<Contact />} />
+            <Route path='/login' element={<Login />}></Route>
+            <Route path='/profile' element={<Profile />} />
+            <Route path='/lobby' element={<GameLobby />} /> 
+            <Route path='/game/:gameId' element={<GamePlay />} /> 
           </Routes>
         </div>
       </BrowserRouter>
