@@ -1,83 +1,160 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import BingoGrid from "./BingoGrid";
 import LoginDialog from "./LoginDialog";
 
 export const Home: React.FC = () => {
-  const [fields, setFields] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<"meeting" | "lecture">("meeting");
-  const [username, setUsername] = useState<string | null>(null);
+	const [fields, setFields] = useState<string[]>([]);
+	const [crossed, setCrossed] = useState<boolean[]>(Array(25).fill(false));
+	const [loading, setLoading] = useState(false);
+	const [mode, setMode] = useState<"meeting" | "lecture">("meeting");
+	const [editing, setEditing] = useState(true);
+	const [bingoStatus, setBingoStatus] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch("http://localhost:3000/api/auth/me", {
-      credentials: "include",
-    })
-      .then(async (res) => {
-        if (res.ok) {
-          const data = await res.json();
-          setUsername(data.username);
-        } else {
-          setUsername(null);
-        }
-      })
-      .catch(() => setUsername(null));
-  }, []);
+	const handleModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		setMode(event.target.value as "meeting" | "lecture");
+	};
 
-  const handleModeChange = (newMode: "meeting" | "lecture") => {
-    setMode(newMode);
-  };
+	const handleNewGame = async () => {
+		setLoading(true);
+		try {
+			const response = await fetch(`http://localhost:3000/${mode}`);
+			if (!response.ok) throw new Error("Failed to fetch new bingo fields");
+			const data = await response.json();
+			setFields(data);
+			setEditing(true);
+			setCrossed(Array(25).fill(false));
+		} catch (error) {
+			alert("Could not fetch new bingo fields.");
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  const handleNewGame = async (selectedMode: "meeting" | "lecture") => {
-    setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:3000/${selectedMode}`);
-      if (!response.ok) throw new Error("Failed to fetch new bingo fields");
-      const data = await response.json();
-      setFields(data);
-    } catch (error) {
-      alert("Could not fetch new bingo fields.");
-    } finally {
-      setLoading(false);
-    }
-  };
+	const handleFieldChange = (index: number, value: string) => {
+		setFields((prev) => {
+			const updated = [...prev];
+			updated[index] = value;
+			return updated;
+		});
+	};
 
-  return (
-    <div className="flex flex-col items-center w-full">
-      {username && (
-        <div className="text-xl font-bold mb-4 text-blue-700">
-          Hello {username}
-        </div>
-      )}
-      <BingoGrid
-        fields={fields}
-        onNewGame={handleNewGame}
-        loading={loading}
-        mode={mode}
-        onModeChange={handleModeChange}
-      />
-    </div>
-  );
+	const handleFieldClick = (index: number) => {
+		if (editing) return;
+		setCrossed((prev) => {
+			const updated = [...prev];
+			updated[index] = !updated[index];
+			return updated;
+		});
+	};
+
+	const hasBingo = () => {
+		const size = 5;
+		const grid = Array(size)
+			.fill(0)
+			.map((_, i) =>
+				Array(size)
+					.fill(0)
+					.map((_, j) => crossed[i * size + j])
+			);
+		for (let i = 0; i < size; i++) {
+			if (grid[i].every(Boolean)) return true;
+			if (grid.map((row) => row[i]).every(Boolean)) return true;
+		}
+		if (grid.map((row, i) => row[i]).every(Boolean)) return true;
+		if (grid.map((row, i) => row[size - 1 - i]).every(Boolean)) return true;
+		return false;
+	};
+
+	const handleBingo = () => {
+		setBingoStatus("You won Bingo!");
+	};
+
+	return (
+		<div className="flex flex-col items-center w-full min-h-screen bg-white pt-24 px-2 box-border">
+			<div className="flex justify-between items-center mb-4">
+				<div className="flex gap-2 items-center m-auto">
+					<label htmlFor="mode-select" className="font-semibold">
+						Type:
+					</label>
+					<select
+						id="mode-select"
+						value={mode}
+						onChange={handleModeChange}
+						className="border rounded px-2 py-1"
+						disabled={loading}
+					>
+						<option value="meeting">Meeting</option>
+						<option value="lecture">Lecture</option>
+					</select>
+					<button
+						className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition disabled:opacity-50"
+						onClick={handleNewGame}
+						disabled={loading}
+					>
+						{loading ? "Loading..." : "New Game"}
+					</button>
+					{editing ? (
+						<button
+							className="cursor-pointer bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition"
+							onClick={() => setEditing(false)}
+							disabled={fields.length === 0}
+						>
+							Start Game
+						</button>
+					) : (
+						<button
+							className="cursor-pointer bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow transition"
+							onClick={() => setEditing(true)}
+						>
+							Edit Fields
+						</button>
+					)}
+				</div>
+			</div>
+			<BingoGrid
+				fields={fields}
+				editing={editing}
+				crossed={crossed}
+				onFieldChange={handleFieldChange}
+				onFieldClick={handleFieldClick}
+			/>
+			{!editing && hasBingo() && (
+				<div className="mt-4 flex flex-col items-center">
+					{!bingoStatus ? (
+						<button
+							className="px-4 py-2 bg-blue-500 text-white rounded"
+							onClick={handleBingo}
+						>
+							Bingo!
+						</button>
+					) : (
+						<div className="text-green-600 font-semibold">{bingoStatus}</div>
+					)}
+				</div>
+			)}
+		</div>
+	);
 };
 
 export const About: React.FC = () => (
-  <div>
-    <h1>About</h1>
-    <p>Learn more about us on this page.</p>
-  </div>
+	<div>
+		<h1>About</h1>
+		<p>Learn more about us on this page.</p>
+	</div>
 );
 
 export const Contact: React.FC = () => (
-  <div>
-    <h1>Contact</h1>
-    <p>Get in touch with us here.</p>
-  </div>
+	<div>
+		<h1>Contact</h1>
+		<p>Get in touch with us here.</p>
+	</div>
 );
 
 export const Pricing: React.FC = () => (
-  <div>
-    <h1>Pricing</h1>
-    <p>See our pricing options.</p>
-  </div>
+	<div>
+		<h1>Pricing</h1>
+		<p>See our pricing options.</p>
+	</div>
 );
 
 export const Login: React.FC = () => <LoginDialog></LoginDialog>;

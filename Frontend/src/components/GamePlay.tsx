@@ -1,181 +1,254 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import BingoGrid from "./BingoGrid";
 
 type Player = { _id: string; username: string };
 type Game = {
-  _id: string;
-  fields: string[];
-  playerFields: Record<string, string[]>;
-  players: Player[];
-  creator: Player;
-  readyPlayers: string[];
-  started: boolean;
-  finished: boolean;
-  winner?: { username: string };
+	_id: string;
+	fields: string[];
+	playerFields: Record<string, string[]>;
+	players: Player[];
+	creator: Player;
+	readyPlayers: string[];
+	started: boolean;
+	finished: boolean;
+	winner?: { username: string };
 };
 
 export const GamePlay: React.FC = () => {
-  const { gameId } = useParams();
-  const [myId, setMyId] = useState<string | null>(null);
-  const [game, setGame] = useState<Game | null>(null);
-  const [fields, setFields] = useState<string[]>([]);
-  const [selected, setSelected] = useState<number[]>([]);
-  const [saveStatus, setSaveStatus] = useState<null | string>(null);
-  const [ready, setReady] = useState(false);
+	const { gameId } = useParams();
+	const [myId, setMyId] = useState<string | null>(null);
+	const [game, setGame] = useState<Game | null>(null);
+	const [fields, setFields] = useState<string[]>([]);
+	const [suggestionFields, setSuggestionFields] = useState<string[]>([]);
+	const [saveButtonStatus, setSaveButtonStatus] = useState<
+		"idle" | "saving" | "saved" | "error"
+	>("idle");
+	const [ready, setReady] = useState(false);
+	const [crossed, setCrossed] = useState<boolean[]>(Array(25).fill(false));
 
-  useEffect(() => {
-    fetch("http://localhost:3000/api/auth/me", { credentials: "include" })
-      .then(res => res.json())
-      .then(data => setMyId(data._id));
-  }, []);
+	useEffect(() => {
+		fetch("http://localhost:3000/api/auth/me", { credentials: "include" })
+			.then((res) => res.json())
+			.then((data) => setMyId(data._id));
+	}, []);
 
-  useEffect(() => {
-    if (!myId) return;
-    const fetchGame = () => {
-      fetch(`http://localhost:3000/api/game/${gameId}`, { credentials: "include" })
-        .then(res => res.json())
-        .then(data => {
-          setGame(data);
-          if (data.playerFields && data.playerFields[myId]) {
-            setFields(data.playerFields[myId]);
-          } else {
-            setFields(data.fields);
-          }
-          setReady(data.readyPlayers.includes(myId));
-        });
-    };
-    fetchGame();
-    const interval = setInterval(fetchGame, 2000);
-    return () => clearInterval(interval);
-  }, [gameId, myId]);
+	// Fetch suggestion fields ONCE
+	useEffect(() => {
+		const fetchSuggestions = async () => {
+			const response = await fetch("http://localhost:3000/lecture");
+			if (response.ok) {
+				const lectureFields = await response.json();
+				setSuggestionFields(lectureFields);
+			} else {
+				setSuggestionFields(Array(25).fill(""));
+			}
+		};
+		fetchSuggestions();
+	}, []);
 
-  if (!game || !myId) return <div>Loading game...</div>;
+	useEffect(() => {
+		if (!myId) return;
+		const fetchGame = async () => {
+			const res = await fetch(`http://localhost:3000/api/game/${gameId}`, {
+				credentials: "include",
+			});
+			const data = await res.json();
+			setGame(data);
+			if (data.playerFields && data.playerFields[myId]) {
+				setFields(data.playerFields[myId]);
+			} else if (fields.length === 0 && suggestionFields.length === 25) {
+				setFields([...suggestionFields]);
+			}
+			setReady(data.readyPlayers.includes(myId));
+		};
+		fetchGame();
+		const interval = setInterval(fetchGame, 2000);
+		return () => clearInterval(interval);
+	}, [gameId, myId, suggestionFields, fields]);
 
-  const allReady = game.readyPlayers.length === game.players.length;
+	if (!game || !myId) return <div>Loading game...</div>;
 
-  const handleStart = async () => {
-    await fetch(`http://localhost:3000/api/game/start/${gameId}`, {
-      method: "POST",
-      credentials: "include",
-    });
-  };
+	const allReady = game.readyPlayers.length === game.players.length;
 
-  const saveFields = async () => {
-    setSaveStatus(null);
-    const res = await fetch(`http://localhost:3000/api/game/${gameId}/fields`, {
-      method: "PUT",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fields }),
-    });
-    if (res.ok) setSaveStatus("Saved!");
-    else setSaveStatus("Error saving fields.");
-  };
+	const handleStart = async () => {
+		await fetch(`http://localhost:3000/api/game/start/${gameId}`, {
+			method: "POST",
+			credentials: "include",
+		});
+	};
 
-  const handleReady = async () => {
-    await saveFields();
-    await fetch(`http://localhost:3000/api/game/ready/${gameId}`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setReady(true);
-  };
+	const saveFields = async () => {
+		setSaveButtonStatus("saving");
+		const res = await fetch(`http://localhost:3000/api/game/${gameId}/fields`, {
+			method: "PUT",
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ fields }),
+		});
+		if (res.ok) {
+			setSaveButtonStatus("saved");
+			setTimeout(() => setSaveButtonStatus("idle"), 2000);
+		} else {
+			setSaveButtonStatus("error");
+			setTimeout(() => setSaveButtonStatus("idle"), 2000);
+		}
+	};
 
-  const handleSelect = (idx: number) => {
-    if (!selected.includes(idx)) setSelected([...selected, idx]);
-  };
-  const hasBingo = () => {
-    const size = 5;
-    const grid = Array(size).fill(0).map((_, i) =>
-      Array(size).fill(0).map((_, j) => selected.includes(i * size + j))
-    );
-    for (let i = 0; i < size; i++) {
-      if (grid[i].every(Boolean)) return true;
-      if (grid.map(row => row[i]).every(Boolean)) return true;
-    }
-    if (grid.map((row, i) => row[i]).every(Boolean)) return true;
-    if (grid.map((row, i) => row[size - 1 - i]).every(Boolean)) return true;
-    return false;
-  };
-  const reportBingo = async () => {
-    await fetch(`http://localhost:3000/api/game/bingo/${gameId}`, {
-      method: "POST",
-      credentials: "include",
-    });
-  };
+	const handleReady = async () => {
+		await saveFields();
+		await fetch(`http://localhost:3000/api/game/ready/${gameId}`, {
+			method: "POST",
+			credentials: "include",
+		});
+		setReady(true);
+	};
 
-  return (
-    <div className="p-8">
-      <h1 className="text-xl font-bold mb-2">Game {game._id.slice(-5)}</h1>
-      <div className="mb-2">Players: {game.players.map(p => p.username).join(", ")}</div>
-      <div className="mb-2">Creator: {game.creator.username}</div>
-      {game.finished && game.winner ? (
-        <div className="text-green-600 font-bold mb-4">Winner: {game.winner.username}</div>
-      ) : !game.started ? (
-        game.creator && game.creator._id === myId ? (
-          <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={handleStart}>
-            Start Game (fields become editable)
-          </button>
-        ) : (
-          <div>Waiting for creator to start the game...</div>
-        )
-      ) : !allReady ? (
-        <>
-          <div className="grid grid-cols-5 gap-2 mb-4">
-            {fields.map((field, idx) => (
-              <input
-                key={idx}
-                className="p-2 border rounded text-center w-28"
-                value={field}
-                onChange={e => {
-                  const updated = [...fields];
-                  updated[idx] = e.target.value;
-                  setFields(updated);
-                }}
-                disabled={ready}
-              />
-            ))}
-          </div>
-          <button
-            className="mb-4 px-4 py-2 bg-yellow-500 text-white rounded"
-            onClick={saveFields}
-            disabled={ready}
-          >
-            Save Fields
-          </button>
-          <button
-            className="mb-4 px-4 py-2 bg-green-500 text-white rounded"
-            onClick={handleReady}
-            disabled={ready}
-          >
-            {ready ? "Waiting for others..." : "Ready"}
-          </button>
-          {saveStatus && <div className="mb-2 text-sm">{saveStatus}</div>}
-          <div>
-            Ready: {game.readyPlayers.length} / {game.players.length}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="grid grid-cols-5 gap-2 mb-4">
-            {fields.map((field, idx) => (
-              <button
-                key={idx}
-                className={`p-2 border rounded w-28 ${selected.includes(idx) ? "bg-green-300" : "bg-white"}`}
-                onClick={() => handleSelect(idx)}
-                disabled={selected.includes(idx) || game.finished}
-              >
-                {field}
-              </button>
-            ))}
-          </div>
-          {hasBingo() && !game.finished && (
-            <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={reportBingo}>
-              Report Bingo!
-            </button>
-          )}
-        </>
-      )}
-    </div>
-  );
+	const handleFieldChange = (index: number, value: string) => {
+		setFields((prev) => {
+			const updated = [...prev];
+			updated[index] = value;
+			return updated;
+		});
+	};
+
+	const handleFieldClick = (index: number) => {
+		if (!ready && !game?.finished) return;
+		setCrossed((prev) => {
+			const updated = [...prev];
+			updated[index] = !updated[index];
+			return updated;
+		});
+	};
+
+	const hasBingo = () => {
+		const size = 5;
+		const grid = Array(size)
+			.fill(0)
+			.map((_, i) =>
+				Array(size)
+					.fill(0)
+					.map((_, j) => crossed[i * size + j])
+			);
+		for (let i = 0; i < size; i++) {
+			if (grid[i].every(Boolean)) return true;
+			if (grid.map((row) => row[i]).every(Boolean)) return true;
+		}
+		if (grid.map((row, i) => row[i]).every(Boolean)) return true;
+		if (grid.map((row, i) => row[size - 1 - i]).every(Boolean)) return true;
+		return false;
+	};
+
+	const reportBingo = async () => {
+		await fetch(`http://localhost:3000/api/game/bingo/${gameId}`, {
+			method: "POST",
+			credentials: "include",
+		});
+	};
+
+	return (
+		<div className="flex flex-col items-center w-full bg-white pt-8 px-2 box-border mt-10">
+			{game.finished && game.winner ? (
+				<div className="flex flex-col items-center justify-center h-full text-center">
+					<h1 className="text-3xl font-bold mb-2">Game {game._id.slice(-5)}</h1>
+					<div className="text-xl mb-1">
+						Players: {game.players.map((p) => p.username).join(", ")}
+					</div>
+					<div className="text-xl mb-1">Creator: {game.creator.username}</div>
+					<div className="text-green-600 text-2xl font-bold">
+						Winner: {game.winner.username}
+					</div>
+				</div>
+			) : (
+				<>
+					<div className="flex flex-row justify-between items-start w-full max-w-3xl mb-2">
+						<div className="flex flex-col">
+							<h1 className="text-xl font-bold mb-0.5">
+								Game {game._id.slice(-5)}
+							</h1>
+							<div className="mb-0.5">
+								Players: {game.players.map((p) => p.username).join(", ")}
+							</div>
+							<div className="mb-0.5">Creator: {game.creator.username}</div>
+						</div>
+						<div className="flex flex-col items-end gap-1">
+							{game.started && !allReady && (
+								<>
+									<button
+										className={`px-4 py-2 rounded text-white ${
+											saveButtonStatus === "saved"
+												? "bg-green-600"
+												: saveButtonStatus === "error"
+												? "bg-red-500"
+												: "bg-yellow-500"
+										}`}
+										onClick={saveFields}
+										disabled={ready || saveButtonStatus === "saving"}
+									>
+										{saveButtonStatus === "saved"
+											? "Saved!"
+											: saveButtonStatus === "error"
+											? "Error"
+											: saveButtonStatus === "saving"
+											? "Saving..."
+											: "Save Fields"}
+									</button>
+									<button
+										className="px-4 py-2 bg-green-500 text-white rounded"
+										onClick={handleReady}
+										disabled={ready}
+									>
+										{ready ? "Waiting for others..." : "Ready"}
+									</button>
+									<div className="text-sm">
+										Ready: {game.readyPlayers.length} / {game.players.length}
+									</div>
+								</>
+							)}
+							{game.started && allReady && hasBingo() && !game.finished && (
+								<button
+									className="px-4 py-2 bg-blue-500 text-white rounded"
+									onClick={reportBingo}
+								>
+									Report Bingo!
+								</button>
+							)}
+							{!game.started && (
+								<>
+									{game.creator && game.creator._id === myId ? (
+										<button
+											className="px-4 py-2 bg-blue-500 text-white rounded"
+											onClick={handleStart}
+										>
+											Start Game (fields become editable)
+										</button>
+									) : (
+										<div>Waiting for creator to start the game...</div>
+									)}
+								</>
+							)}
+						</div>
+					</div>
+					<div className="w-full max-w-3xl flex flex-col items-center">
+						{game.started && !allReady ? (
+							<BingoGrid
+								fields={fields}
+								editing={!ready}
+								crossed={crossed}
+								onFieldChange={handleFieldChange}
+								onFieldClick={handleFieldClick}
+							/>
+						) : game.started && allReady ? (
+							<BingoGrid
+								fields={fields}
+								editing={false}
+								crossed={crossed}
+								onFieldClick={handleFieldClick}
+							/>
+						) : null}
+					</div>
+				</>
+			)}
+		</div>
+	);
 };
