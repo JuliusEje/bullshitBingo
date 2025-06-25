@@ -1,17 +1,23 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const connectDB = require("./src/config/db");
 require('dotenv').config(); 
 
 const MeetingBingoField = require('./src/models/MeetingBingoField');
 const InformaticsLectureTerm = require('./src/models/InformaticsLecutreTerm');
 
 const bingoRoutes = require('./src/routes/bingoRoutes');
+const authRoutes = require('./src/routes/authRoutes');
+const gameRoutes = require('./src/routes/gameRoutes');
 
 const app = express();
 
-app.use(cors());
-app.use(cors({ origin: 'http://localhost:5173' }));
+connectDB();
+
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 const PORT = process.env.PORT || 3000;
 
@@ -97,7 +103,30 @@ async function initializeDatabase() {
 
 app.use(express.json()); 
 
-app.use('/', bingoRoutes); 
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGO_URI,
+            collectionName: "sessions",
+            ttl: 1000 * 60 * 60 * 24 * 7,
+            autoRemove: "interval",
+            autoRemoveInterval: 10,
+        }),
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        },
+    })
+);
+
+app.use('/api/auth', authRoutes);
+app.use('/', bingoRoutes);
+app.use('/api/game', gameRoutes);
 
 app.get('/', (req, res) => {
     res.send('Willkommen zur Bullshit Bingo App!');
