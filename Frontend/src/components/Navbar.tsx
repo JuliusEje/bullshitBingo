@@ -15,7 +15,7 @@ const navLinks: NavLinkType[] = [
 ]
 
 export const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMenuOpen] = useState(false)
   return (
 <header className='fixed w-full px-8 shadow-sm shadow-neutral-500 h-14 flex items-center'>
   <nav className='flex justify-between items-center w-full'>
