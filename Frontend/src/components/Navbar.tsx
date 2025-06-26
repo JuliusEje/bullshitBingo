@@ -12,7 +12,7 @@ const navLinks: NavLinkType[] = [
 	{ name: "Lobby", path: "/lobby" },
 	{ name: "Profile", path: "/profile" },
 	{ name: "About", path: "/about" },
-	{ name: "Contact", path: "/contact" },
+	{ name: "Impressum", path: "/impressum" },
 ];
 
 export const Navbar = () => {
