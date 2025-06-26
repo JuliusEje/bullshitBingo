@@ -4,6 +4,7 @@ import { Profile } from "./components/Profile";
 import { Navbar } from "./components/Navbar";
 import { GameLobby } from "./components/GameLobby";
 import { GamePlay } from "./components/GamePlay";
+import NotFound from "./components/NotFound";
 
 function App() {
 	return (
@@ -20,6 +21,7 @@ function App() {
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/lobby" element={<GameLobby />} />
 						<Route path="/game/:gameId" element={<GamePlay />} />
+						<Route path="*" element={<NotFound />}></Route>
 					</Routes>
 				</div>
 			</BrowserRouter>
