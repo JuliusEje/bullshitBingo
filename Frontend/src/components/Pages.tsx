@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import BingoGrid from "./BingoGrid";
 import LoginDialog from "./LoginDialog";
+import Videos from "./Videos";
 
 export const Home: React.FC = () => {
 	const [fields, setFields] = useState<string[]>([]);
@@ -138,7 +139,7 @@ export const Home: React.FC = () => {
 
 export const About: React.FC = () => {
 	const [cookies, setCookies] = useState(0);
-	const [cps, setCps] = useState(0); // cookies per second
+	const [cps, setCps] = useState(0);
 	const [abilities, setAbilities] = useState([
 		{ name: "Erster Ruf", cost: 10, cps: 1, owned: 0 },
 		{ name: "Glückszahl", cost: 50, cps: 5, owned: 0 },
@@ -152,7 +153,6 @@ export const About: React.FC = () => {
 		{ name: "Hauptgewinn-Fest", cost: 10000000, cps: 1000000, owned: 0 },
 	]);
 
-	// Increase cookies per second
 	React.useEffect(() => {
 		if (cps > 0) {
 			const interval = setInterval(() => setCookies((c) => c + cps), 1000);
@@ -191,97 +191,22 @@ export const About: React.FC = () => {
 	];
 
 	return (
-		<div
-			style={{
-				position: "relative",
-				width: "100vw",
-				height: "100vh",
-				overflow: "hidden",
-			}}
-		>
-			<div
-				style={{
-					position: "absolute",
-					inset: 0,
-					width: "100vw",
-					height: "100vh",
-					display: "grid",
-					gridTemplateColumns: "repeat(5, 1fr)",
-					gridTemplateRows: "repeat(2, 1fr)",
-					zIndex: 1,
-				}}
-			>
-				{videos.map((src, idx) => (
-					<div
-						key={src}
-						style={{
-							width: "100%",
-							height: "100%",
-							overflow: "hidden",
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-							background: "#000",
-						}}
-					>
-						<iframe
-							width="120%"
-							height="120%"
-							style={{
-								width: "120%",
-								height: "120%",
-								aspectRatio: "16/9",
-								objectFit: "cover",
-								border: "none",
-								marginLeft: "-10%",
-							}}
-							src={`${src}?autoplay=1&controls=0&modestbranding=1&rel=0`}
-							title={`YouTube video ${idx + 1}`}
-							frameBorder="0"
-							allow="autoplay"
-						></iframe>
-					</div>
-				))}
-			</div>
+		<div className="relative w-screen h-screen overflow-hidden">
+			<Videos videos={videos} />
 			{/* Center content over the grid */}
-			<div
-				style={{
-					position: "absolute",
-					top: "50%",
-					left: "50%",
-					transform: "translate(-50%, -50%)",
-					zIndex: 2,
-					display: "flex",
-					flexDirection: "column",
-					alignItems: "center",
-					justifyContent: "center",
-					background: "rgba(255,255,255,0.7)",
-					borderRadius: "1rem",
-					padding: "2rem",
-					boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
-					minWidth: 350,
-					maxWidth: 500,
-				}}
-			>
+			<div className="absolute top-1/2 left-1/2 z-10 flex flex-col items-center justify-center bg-white/70 rounded-xl p-8 shadow-lg min-w-[350px] max-w-[500px] -translate-x-1/2 -translate-y-1/2">
 				<button
 					onClick={handleCookieClick}
-					style={{
-						background: "none",
-						border: "none",
-						cursor: "pointer",
-						fontSize: "4rem",
-						marginBottom: "0.5rem",
-						userSelect: "none",
-					}}
+					className="bg-none border-none cursor-pointer text-6xl mb-2 select-none"
 					aria-label="Cookie"
 				>
 					🍪
 				</button>
-				<div style={{ fontWeight: "bold", fontSize: "1.2rem" }}>
+				<div className="font-bold text-lg mb-2">
 					Cookies: {cookies} <br />
 					Cookies/Sekunde: {cps}
 				</div>
-				<p className="mt-4">
+				<p className="mt-4 text-center">
 					Dies ist ein Schulprojekt von Noah, Felix und Julius im Modul Web
 					Engineering.
 					<br />
@@ -301,15 +226,13 @@ export const About: React.FC = () => {
 				</p>
 				<div className="mt-6 w-full flex flex-col items-center">
 					<h3 className="font-semibold mb-2">Abilities</h3>
-					<div className="grid grid-cols-2 gap-2">
-						{" "}
-						{/* Added grid container */}
+					<div className="grid grid-cols-2 gap-2 w-full">
 						{abilities.map((a, i) => (
 							<button
 								key={a.name}
 								onClick={() => buyAbility(i)}
 								disabled={cookies < a.cost}
-								className="text-xs px-4 py-2 rounded bg-blue-500 text-white disabled:bg-gray-400 flex justify-between items-center w-full" /* w-full for grid item */
+								className="text-xs px-4 py-2 rounded bg-blue-500 text-white disabled:bg-gray-400 flex justify-between items-center w-full"
 							>
 								<span>
 									{a.name} (x{a.owned})
