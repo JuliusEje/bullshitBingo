@@ -75,7 +75,7 @@ export const Home: React.FC = () => {
 			<div className="flex justify-between items-center mb-4">
 				<div className="flex gap-2 items-center m-auto">
 					<label htmlFor="mode-select" className="font-semibold">
-						Type:
+						Bingo Mode:
 					</label>
 					<select
 						id="mode-select"
@@ -85,7 +85,7 @@ export const Home: React.FC = () => {
 						disabled={loading}
 					>
 						<option value="meeting">Meeting</option>
-						<option value="lecture">Lecture</option>
+						<option value="lecture">Vorlesung</option>
 					</select>
 					<button
 						className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition disabled:opacity-50"
