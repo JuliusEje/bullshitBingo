@@ -17,26 +17,24 @@ const app = express();
 
 connectDB();
 
-
 const allowedOrigins = [
-  "http://localhost:7456",
-  "http://julius.flxkln.de:7456",
-  process.env.FRONTEND_ORIGIN,
+	"http://localhost:7456",
+	"http://julius.flxkln.de:7456",
+	process.env.FRONTEND_ORIGIN,
 ];
 
 app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
+	cors({
+		origin: function (origin, callback) {
+			if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+				callback(null, true);
+			} else {
+				callback(new Error("Not allowed by CORS"));
+			}
+		},
+		credentials: true,
+	})
 );
-
 
 const PORT = process.env.PORT || 3000;
 
@@ -417,7 +415,7 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
-app.use("/", bingoRoutes);
+app.use("/api/bingo", bingoRoutes);
 app.use("/api/game", gameRoutes);
 
 app.get("/", (req, res) => {

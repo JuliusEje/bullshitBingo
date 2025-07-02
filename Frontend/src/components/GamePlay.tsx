@@ -38,7 +38,7 @@ export const GamePlay: React.FC = () => {
 	// Fetch suggestion fields ONCE
 	useEffect(() => {
 		const fetchSuggestions = async () => {
-			const response = await fetch(`${apiUrl}/lecture`);
+			const response = await fetch(`${apiUrl}/api/bingo/lecture`);
 			if (response.ok) {
 				const lectureFields = await response.json();
 				setSuggestionFields(lectureFields);

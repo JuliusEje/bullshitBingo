@@ -20,7 +20,7 @@ export const Home: React.FC = () => {
 	const handleNewGame = async () => {
 		setLoading(true);
 		try {
-			const response = await fetch(`${apiUrl}/${mode}`);
+			const response = await fetch(`${apiUrl}/api/bingo/${mode}`);
 			if (!response.ok) throw new Error("Failed to fetch new bingo fields");
 			const data = await response.json();
 			setFields(data);
