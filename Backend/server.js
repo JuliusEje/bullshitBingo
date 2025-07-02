@@ -17,8 +17,26 @@ const app = express();
 
 connectDB();
 
-const allowedOrigin = process.env.FRONTEND_ORIGIN || "http://localhost:7456";
-app.use(cors({ origin: allowedOrigin, credentials: true }));
+
+const allowedOrigins = [
+  "http://localhost:7456",
+  "http://julius.flxkln.de:7456",
+  process.env.FRONTEND_ORIGIN,
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 
 const PORT = process.env.PORT || 3000;
 
