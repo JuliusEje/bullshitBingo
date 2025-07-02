@@ -17,7 +17,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - MONGO_URI=mongodb://mongo:27017/meetingBingoDB
+      - MONGO_URI=mongodb://mongo:27017/bullshitBingo
       - PORT=3000
     depends_on:
       - mongo
@@ -27,7 +27,7 @@ services:
     container_name: frontend
     restart: always
     ports:
-      - "5173:80"
+      - "7456:7456"
     depends_on:
       - backend
 
