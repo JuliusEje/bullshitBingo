@@ -1,20 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config(); 
+require('dotenv').config();
 
 const MeetingBingoField = require('./src/models/MeetingBingoField');
 const InformaticsLectureTerm = require('./src/models/InformaticsLecutreTerm');
-
 const bingoRoutes = require('./src/routes/bingoRoutes');
 
 const app = express();
 
 app.use(cors());
 app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(express.json());
+app.use('/', bingoRoutes);
 
 const PORT = process.env.PORT || 3000;
-
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/meetingBingoDB';
 
 const meetingBingoStrings = [
@@ -66,7 +66,7 @@ const informaticsLectureStrings = [
 
 async function initializeDatabase() {
     try {
-        await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect(MONGO_URI);
         console.log('Verbindung zu MongoDB hergestellt.');
 
         const meetingCount = await MeetingBingoField.countDocuments();
@@ -95,16 +95,16 @@ async function initializeDatabase() {
     }
 }
 
-app.use(express.json()); 
-
-app.use('/', bingoRoutes); 
-
 app.get('/', (req, res) => {
     res.send('Willkommen zur Bullshit Bingo App!');
 });
 
-initializeDatabase().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server läuft auf Port ${PORT}`);
+if (process.env.NODE_ENV !== 'test') {
+    initializeDatabase().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server läuft auf Port ${PORT}`);
+        });
     });
-});
+}
+
+module.exports = app;
