@@ -41,7 +41,7 @@ export const GameLobby: React.FC = () => {
 	};
 
 	const joinGame = async (gameId: string) => {
-		await fetch(`${apiUrl}:3000/api/game/join/${gameId}`, {
+		await fetch(`${apiUrl}/api/game/join/${gameId}`, {
 			method: "POST",
 			credentials: "include",
 		});
