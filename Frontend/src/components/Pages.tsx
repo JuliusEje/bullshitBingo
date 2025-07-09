@@ -7,14 +7,14 @@ export const Home: React.FC = () => {
 	const [fields, setFields] = useState<string[]>([]);
 	const [crossed, setCrossed] = useState<boolean[]>(Array(25).fill(false));
 	const [loading, setLoading] = useState(false);
-	const [mode, setMode] = useState<"meeting" | "lecture">("meeting");
+	const [mode, setMode] = useState<"meeting" | "lecture" | "presentation">("meeting");
 	const [editing, setEditing] = useState(true);
 	const [bingoStatus, setBingoStatus] = useState<string | null>(null);
 
 	const apiUrl = import.meta.env.VITE_API_URL;
 
 	const handleModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		setMode(event.target.value as "meeting" | "lecture");
+		setMode(event.target.value as "meeting" | "lecture" | "presentation");
 	};
 
 	const handleNewGame = async () => {
@@ -88,6 +88,7 @@ export const Home: React.FC = () => {
 					>
 						<option value="meeting">Meeting</option>
 						<option value="lecture">Vorlesung</option>
+						<option value="presentation">Präsentation</option>
 					</select>
 					<button
 						className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition disabled:opacity-50"

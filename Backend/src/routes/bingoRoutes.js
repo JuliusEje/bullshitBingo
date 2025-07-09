@@ -3,6 +3,7 @@ const router = express.Router();
 
 const MeetingBingoField = require('../models/MeetingBingoField');
 const InformaticsLectureTerm = require('../models/InformaticsLecutreTerm');
+const PresentationTerms = require('../models/PresentationTerms');
 
 /**
  * @route GET /meeting
@@ -37,6 +38,24 @@ router.get('/lecture', async (req, res) => {
     } catch (error) {
         console.error('Fehler beim Abrufen der Informatik Vorlesungsbegriffe:', error);
         res.status(500).json({ message: 'Serverfehler beim Abrufen der Informatik Vorlesungsbegriffe.' });
+    }
+});
+
+/**
+ * @route GET /presentation
+ * @desc Holt 25 zufällige Präsentationsbegriffe
+ * @access Public
+ */
+router.get('/presentation', async (req, res) => {
+    try {
+        const randomTerms = await PresentationTerms.aggregate([{ $sample: { size: 25 } }]);
+
+        const terms = randomTerms.map(doc => doc.phrase);
+
+        res.json(terms);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Präsentationsbegriffe:', error);
+        res.status(500).json({ message: 'Serverfehler beim Abrufen der Präsentationsbegriffe.' });
     }
 });
 
