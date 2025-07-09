@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const MeetingBingoField = require('./src/models/MeetingBingoField');
 const InformaticsLectureTerm = require('./src/models/InformaticsLecutreTerm');
+const PresentationTerms = require('./src/models/PresentationTerms');
 
 const bingoRoutes = require('./src/routes/bingoRoutes');
 const authRoutes = require('./src/routes/authRoutes');
@@ -132,6 +133,12 @@ const informaticsLectureStrings = [
     "Das passiert den Besten", "Das sagen sogar die Informatiker", "Ich hol kurz Luft – dann weiter"
 ];
 
+const PresentationTermsStrings = [
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+    "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+    "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
+    "31", "32", "33", "34", "35"
+];
 
 async function initializeDatabase() {
     try {
@@ -156,6 +163,16 @@ async function initializeDatabase() {
             console.log(`${docs.length} Dokumente in InformaticsLectureTerms eingefügt.`);
         } else {
             console.log('InformaticsLectureTerms Collection enthält bereits Daten. Überspringe Befüllung.');
+        }
+
+        const presentationCount = await PresentationTerms.countDocuments();
+        if(presentationCount === 0) {
+            console.log('PresentationTerms Collection ist leer. Befülle mit Daten...');
+            const docs = PresentationTermsStrings.map(s => ({ phrase: s }));
+            await PresentationTerms.insertMany(docs);
+            console.log(`${docs.length} Dokumente in PresentationTerms eingefügt.`);
+        } else {
+            console.log('PresentationTerms Collection enthält bereits Daten. Überspringe Befüllung.');
         }
 
     } catch (error) {
