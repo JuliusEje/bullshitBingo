@@ -10,6 +10,8 @@ const LoginDialog: React.FC = () => {
 	const [success, setSuccess] = useState("");
 	const navigate = useNavigate();
 
+	const apiUrl = import.meta.env.VITE_API_URL;
+
 	const isStrongPassword = (pw: string) =>
 		/[A-Z]/.test(pw) &&
 		/[a-z]/.test(pw) &&
@@ -41,17 +43,14 @@ const LoginDialog: React.FC = () => {
 				return;
 			}
 			try {
-				const response = await fetch(
-					"http://localhost:3000/api/auth/register",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						credentials: "include",
-						body: JSON.stringify({ username, password }),
-					}
-				);
+				const response = await fetch(`${apiUrl}/api/auth/register`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({ username, password }),
+				});
 				if (response.ok) {
 					setSuccess("Signup successful! Redirecting to login...");
 					setTimeout(() => {
@@ -70,7 +69,7 @@ const LoginDialog: React.FC = () => {
 			}
 		} else {
 			try {
-				const response = await fetch("http://localhost:3000/api/auth/login", {
+				const response = await fetch(`${apiUrl}/api/auth/login`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

@@ -11,6 +11,8 @@ export const Home: React.FC = () => {
 	const [editing, setEditing] = useState(true);
 	const [bingoStatus, setBingoStatus] = useState<string | null>(null);
 
+	const apiUrl = import.meta.env.VITE_API_URL;
+
 	const handleModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		setMode(event.target.value as "meeting" | "lecture" | "presentation");
 	};
@@ -18,7 +20,7 @@ export const Home: React.FC = () => {
 	const handleNewGame = async () => {
 		setLoading(true);
 		try {
-			const response = await fetch(`http://localhost:3000/${mode}`);
+			const response = await fetch(`${apiUrl}/api/bingo/${mode}`);
 			if (!response.ok) throw new Error("Failed to fetch new bingo fields");
 			const data = await response.json();
 			setFields(data);
@@ -256,9 +258,12 @@ export const Impressum: React.FC = () => (
 		<br />
 		<p className="font-bold">Angaben gemäß § 5 TMG:</p>
 		<p>
-			Felix Karg<br />
-			Franziska-Zellner-Weg 35<br />
-			85567 Grafing b. München<br />
+			Felix Karg
+			<br />
+			Franziska-Zellner-Weg 35
+			<br />
+			85567 Grafing b. München
+			<br />
 			Deutschland
 		</p>
 		<br />
@@ -268,15 +273,19 @@ export const Impressum: React.FC = () => (
 		</p>
 		<br />
 
-		<p className="font-bold">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:</p>
+		<p className="font-bold">
+			Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:
+		</p>
 		<p>
-			Felix Karg<br />
-			Franziska-Zellner-Weg 35<br />
-			85567 Grafing b. München<br />
+			Felix Karg
+			<br />
+			Franziska-Zellner-Weg 35
+			<br />
+			85567 Grafing b. München
+			<br />
 			Deutschland
 		</p>
 		<br />
-
 	</div>
 );
 

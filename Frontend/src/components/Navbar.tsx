@@ -21,8 +21,10 @@ export const Navbar = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
+	const apiUrl = import.meta.env.VITE_API_URL;
+
 	useEffect(() => {
-		fetch("http://localhost:3000/api/auth/me", {
+		fetch(`${apiUrl}/api/auth/me`, {
 			credentials: "include",
 		})
 			.then(async (res) => {
@@ -38,7 +40,7 @@ export const Navbar = () => {
 	}, [location]);
 
 	const handleSignOut = async () => {
-		await fetch("http://localhost:3000/api/auth/logout", {
+		await fetch(`${apiUrl}/api/auth/logout`, {
 			method: "POST",
 			credentials: "include",
 		});

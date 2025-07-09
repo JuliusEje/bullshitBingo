@@ -5,7 +5,7 @@ A humorous, accessible web app for meetings where too much is said – and too l
 
 Create your personal bullshit bingo board with common business buzzwords like “quick win,” “leverage synergies,” or “we need to think big.” Perfect for online meetings, presentations, or workshops.
 
-🌐 Live demo (optional): https://shitbingo.de
+🌐 Live demo : <a href="https://shitbingo.de:7456" target="_blank">Bullshit Bingo</a>
 
 🛠️ Project status: In development
 
