@@ -38,7 +38,7 @@ export const GamePlay: React.FC = () => {
 	// Fetch suggestion fields ONCE
 	useEffect(() => {
 		const fetchSuggestions = async () => {
-			const response = await fetch(`${apiUrl}/api/bingo/lecture`);
+			const response = await fetch(`${apiUrl}/api/bingo/presentation`);
 			if (response.ok) {
 				const lectureFields = await response.json();
 				setSuggestionFields(lectureFields);
@@ -176,32 +176,56 @@ export const GamePlay: React.FC = () => {
 						<div className="flex flex-col items-end gap-1">
 							{game.started && !allReady && (
 								<>
-									<button
-										className={`px-4 py-2 rounded text-white ${
-											saveButtonStatus === "saved"
-												? "bg-green-600"
+									<div className="flex flex-row gap-2 items-center">
+										<button
+											className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition"
+											onClick={async () => {
+												try {
+													const response = await fetch(
+														`${apiUrl}/api/bingo/presentation`
+													);
+													if (response.ok) {
+														const newFields = await response.json();
+														setFields([...newFields]);
+														setCrossed(Array(25).fill(false));
+													} else {
+														alert("Could not fetch new bingo fields.");
+													}
+												} catch {
+													alert("Could not fetch new bingo fields.");
+												}
+											}}
+											disabled={ready}
+										>
+											New Words
+										</button>
+										<button
+											className={`px-4 py-2 rounded text-white ${
+												saveButtonStatus === "saved"
+													? "bg-green-600"
+													: saveButtonStatus === "error"
+													? "bg-red-500"
+													: "bg-yellow-500"
+											}`}
+											onClick={saveFields}
+											disabled={ready || saveButtonStatus === "saving"}
+										>
+											{saveButtonStatus === "saved"
+												? "Saved!"
 												: saveButtonStatus === "error"
-												? "bg-red-500"
-												: "bg-yellow-500"
-										}`}
-										onClick={saveFields}
-										disabled={ready || saveButtonStatus === "saving"}
-									>
-										{saveButtonStatus === "saved"
-											? "Saved!"
-											: saveButtonStatus === "error"
-											? "Error"
-											: saveButtonStatus === "saving"
-											? "Saving..."
-											: "Save Fields"}
-									</button>
-									<button
-										className="px-4 py-2 bg-green-500 text-white rounded"
-										onClick={handleReady}
-										disabled={ready}
-									>
-										{ready ? "Waiting for others..." : "Ready"}
-									</button>
+												? "Error"
+												: saveButtonStatus === "saving"
+												? "Saving..."
+												: "Save Fields"}
+										</button>
+										<button
+											className="px-4 py-2 bg-green-500 text-white rounded"
+											onClick={handleReady}
+											disabled={ready}
+										>
+											{ready ? "Waiting for others..." : "Ready"}
+										</button>
+									</div>
 									<div className="text-sm">
 										Ready: {game.readyPlayers.length} / {game.players.length}
 									</div>
