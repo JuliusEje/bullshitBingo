@@ -14,7 +14,7 @@ export const Profile: React.FC = () => {
 
 	if (!profile) return <div>Loading...</div>;
 
-	console.log("Profile data:", profile);
+//	console.log("Profile data:", profile);
 
 	return (
 		<div className="p-8">
