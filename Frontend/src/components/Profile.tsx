@@ -6,10 +6,8 @@ export const Profile: React.FC = () => {
 		points?: number;
 	} | null>(null);
 
-	const apiUrl = import.meta.env.VITE_API_URL;
-
 	useEffect(() => {
-		fetch(`${apiUrl}/api/auth/me`, { credentials: "include" })
+		fetch(`/api/auth/me`, { credentials: "include" })
 			.then((res) => (res.ok ? res.json() : null))
 			.then((data) => setProfile(data));
 	}, []);

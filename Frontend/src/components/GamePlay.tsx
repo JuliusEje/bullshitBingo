@@ -27,10 +27,8 @@ export const GamePlay: React.FC = () => {
 	const [ready, setReady] = useState(false);
 	const [crossed, setCrossed] = useState<boolean[]>(Array(25).fill(false));
 
-	const apiUrl = import.meta.env.VITE_API_URL;
-
 	useEffect(() => {
-		fetch(`${apiUrl}/api/auth/me`, { credentials: "include" })
+		fetch(`/api/auth/me`, { credentials: "include" })
 			.then((res) => res.json())
 			.then((data) => setMyId(data._id));
 	}, []);
@@ -38,7 +36,7 @@ export const GamePlay: React.FC = () => {
 	// Fetch suggestion fields ONCE
 	useEffect(() => {
 		const fetchSuggestions = async () => {
-			const response = await fetch(`${apiUrl}/api/bingo/presentation`);
+			const response = await fetch(`/api/bingo/presentation`);
 			if (response.ok) {
 				const lectureFields = await response.json();
 				setSuggestionFields(lectureFields);
@@ -52,7 +50,7 @@ export const GamePlay: React.FC = () => {
 	useEffect(() => {
 		if (!myId) return;
 		const fetchGame = async () => {
-			const res = await fetch(`${apiUrl}/api/game/${gameId}`, {
+			const res = await fetch(`/api/game/${gameId}`, {
 				credentials: "include",
 			});
 			const data = await res.json();
@@ -74,7 +72,7 @@ export const GamePlay: React.FC = () => {
 	const allReady = game.readyPlayers.length === game.players.length;
 
 	const handleStart = async () => {
-		await fetch(`${apiUrl}/api/game/start/${gameId}`, {
+		await fetch(`/api/game/start/${gameId}`, {
 			method: "POST",
 			credentials: "include",
 		});
@@ -82,7 +80,7 @@ export const GamePlay: React.FC = () => {
 
 	const saveFields = async () => {
 		setSaveButtonStatus("saving");
-		const res = await fetch(`${apiUrl}/api/game/${gameId}/fields`, {
+		const res = await fetch(`/api/game/${gameId}/fields`, {
 			method: "PUT",
 			credentials: "include",
 			headers: { "Content-Type": "application/json" },
@@ -99,7 +97,7 @@ export const GamePlay: React.FC = () => {
 
 	const handleReady = async () => {
 		await saveFields();
-		await fetch(`${apiUrl}/api/game/ready/${gameId}`, {
+		await fetch(`/api/game/ready/${gameId}`, {
 			method: "POST",
 			credentials: "include",
 		});
@@ -142,7 +140,7 @@ export const GamePlay: React.FC = () => {
 	};
 
 	const reportBingo = async () => {
-		await fetch(`${apiUrl}/api/game/bingo/${gameId}`, {
+		await fetch(`/api/game/bingo/${gameId}`, {
 			method: "POST",
 			credentials: "include",
 		});
@@ -182,7 +180,7 @@ export const GamePlay: React.FC = () => {
 											onClick={async () => {
 												try {
 													const response = await fetch(
-														`${apiUrl}/api/bingo/presentation`
+														`/api/bingo/presentation`
 													);
 													if (response.ok) {
 														const newFields = await response.json();

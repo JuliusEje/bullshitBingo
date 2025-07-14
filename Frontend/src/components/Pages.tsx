@@ -13,14 +13,13 @@ export const Home: React.FC = () => {
 	const [editing, setEditing] = useState(true);
 	const [bingoStatus, setBingoStatus] = useState<string | null>(null);
 
-	const apiUrl = import.meta.env.VITE_API_URL;
 
 	// Fetch initial bingo grid on mount
 	React.useEffect(() => {
 		const fetchInitialFields = async () => {
 			setLoading(true);
 			try {
-				const response = await fetch(`${apiUrl}/api/bingo/${mode}`);
+				const response = await fetch(`/api/bingo/${mode}`);
 				if (!response.ok) throw new Error("Failed to fetch new bingo fields");
 				const data = await response.json();
 				setFields(data);
@@ -44,7 +43,7 @@ export const Home: React.FC = () => {
 	const handleNewGame = async () => {
 		setLoading(true);
 		try {
-			const response = await fetch(`${apiUrl}/api/bingo/${mode}`);
+			const response = await fetch(`/api/bingo/${mode}`);
 			if (!response.ok) throw new Error("Failed to fetch new bingo fields");
 			const data = await response.json();
 			setFields(data);

@@ -14,10 +14,8 @@ export const GameLobby: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 
-	const apiUrl = import.meta.env.VITE_API_URL;
-
 	useEffect(() => {
-		fetch(`${apiUrl}/api/game/list`, { credentials: "include" })
+		fetch(`/api/game/list`, { credentials: "include" })
 			.then((res) => res.json())
 			.then((data) => {
 				setGames(Array.isArray(data) ? data : []);
@@ -30,7 +28,7 @@ export const GameLobby: React.FC = () => {
 	}, []);
 
 	const createGame = async () => {
-		const res = await fetch(`${apiUrl}/api/game/create`, {
+		const res = await fetch(`/api/game/create`, {
 			method: "POST",
 			credentials: "include",
 			headers: { "Content-Type": "application/json" },
@@ -41,7 +39,7 @@ export const GameLobby: React.FC = () => {
 	};
 
 	const joinGame = async (gameId: string) => {
-		await fetch(`${apiUrl}/api/game/join/${gameId}`, {
+		await fetch(`/api/game/join/${gameId}`, {
 			method: "POST",
 			credentials: "include",
 		});
