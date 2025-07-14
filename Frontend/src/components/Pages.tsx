@@ -278,37 +278,6 @@ export const About: React.FC = () => {
 export const Impressum: React.FC = () => (
 	<div>
 		<h1 className="font-extrabold text-5xl">Impressum</h1>
-		<br />
-		<p className="font-bold">Angaben gemäß § 5 TMG:</p>
-		<p>
-			Felix Karg
-			<br />
-			Franziska-Zellner-Weg 35
-			<br />
-			85567 Grafing b. München
-			<br />
-			Deutschland
-		</p>
-		<br />
-		<p className="font-bold">Kontakt:</p>
-		<p>
-			E-Mail: <a href="mailto:felix.karg@gmx.net">felix.karg@gmx.net</a>
-		</p>
-		<br />
-
-		<p className="font-bold">
-			Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:
-		</p>
-		<p>
-			Felix Karg
-			<br />
-			Franziska-Zellner-Weg 35
-			<br />
-			85567 Grafing b. München
-			<br />
-			Deutschland
-		</p>
-		<br />
 	</div>
 );
 
