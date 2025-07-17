@@ -7,14 +7,38 @@ export const Home: React.FC = () => {
 	const [fields, setFields] = useState<string[]>([]);
 	const [crossed, setCrossed] = useState<boolean[]>(Array(25).fill(false));
 	const [loading, setLoading] = useState(false);
-	const [mode, setMode] = useState<"meeting" | "lecture">("meeting");
+	const [mode, setMode] = useState<"meeting" | "lecture" | "presentation">(
+		"meeting"
+	);
 	const [editing, setEditing] = useState(true);
 	const [bingoStatus, setBingoStatus] = useState<string | null>(null);
 
 	const apiUrl = import.meta.env.VITE_API_URL;
 
+	// Fetch initial bingo grid on mount
+	React.useEffect(() => {
+		const fetchInitialFields = async () => {
+			setLoading(true);
+			try {
+				const response = await fetch(`${apiUrl}/api/bingo/${mode}`);
+				if (!response.ok) throw new Error("Failed to fetch new bingo fields");
+				const data = await response.json();
+				setFields(data);
+				setEditing(true);
+				setCrossed(Array(25).fill(false));
+			} catch (error) {
+				alert("Could not fetch new bingo fields.");
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchInitialFields();
+		// Only run on mount, not when mode changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	const handleModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		setMode(event.target.value as "meeting" | "lecture");
+		setMode(event.target.value as "meeting" | "lecture" | "presentation");
 	};
 
 	const handleNewGame = async () => {
@@ -88,6 +112,7 @@ export const Home: React.FC = () => {
 					>
 						<option value="meeting">Meeting</option>
 						<option value="lecture">Vorlesung</option>
+						<option value="presentation">Präsentation</option>
 					</select>
 					<button
 						className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition disabled:opacity-50"

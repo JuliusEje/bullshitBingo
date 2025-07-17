@@ -9,12 +9,29 @@ type Game = {
 	winner?: { username: string };
 };
 
+type User = {
+	_id: string;
+	username: string;
+	points?: number;
+};
+
 export const GameLobby: React.FC = () => {
 	const [games, setGames] = useState<Game[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [currentUser, setCurrentUser] = useState<User | null>(null);
 	const navigate = useNavigate();
 
 	const apiUrl = import.meta.env.VITE_API_URL;
+
+	useEffect(() => {
+		fetch(`${apiUrl}/api/auth/me`, { credentials: "include" })
+			.then((res) => {
+				if (!res.ok) throw new Error();
+				return res.json();
+			})
+			.then((user) => setCurrentUser(user))
+			.catch(() => setCurrentUser(null));
+	}, []);
 
 	useEffect(() => {
 		fetch(`${apiUrl}/api/game/list`, { credentials: "include" })
@@ -48,7 +65,7 @@ export const GameLobby: React.FC = () => {
 		navigate(`/game/${gameId}`);
 	};
 
-	if (loading) return <div>Loading games...</div>;
+	if (loading || !currentUser) return <div>Loading games...</div>;
 
 	return (
 		<div className="p-8">
@@ -63,23 +80,36 @@ export const GameLobby: React.FC = () => {
 				<div>No games available. Create a new game to get started!</div>
 			) : (
 				<ul>
-					{games.map((game) => (
-						<li key={game._id} className="mb-2">
-							Game {game._id.slice(-5)} | Players:{" "}
-							{game.players.map((p) => p.username).join(", ")}{" "}
-							{game.finished && game.winner
-								? `(Winner: ${game.winner.username})`
-								: ""}
-							{!game.started && !game.finished && (
-								<button
-									className="ml-2 px-2 py-1 bg-green-500 text-white rounded"
-									onClick={() => joinGame(game._id)}
-								>
-									Join
-								</button>
-							)}
-						</li>
-					))}
+					{games.map((game) => {
+						const isPlayer = game.players.some(
+							(p) => p.username === currentUser.username
+						);
+						return (
+							<li key={game._id} className="mb-2">
+								Game {game._id.slice(-5)} | Players:{" "}
+								{game.players.map((p) => p.username).join(", ")}{" "}
+								{game.finished && game.winner
+									? `(Winner: ${game.winner.username})`
+									: ""}
+								{!game.started && !game.finished && !isPlayer && (
+									<button
+										className="ml-2 px-2 py-1 bg-green-500 text-white rounded"
+										onClick={() => joinGame(game._id)}
+									>
+										Join
+									</button>
+								)}
+								{game.started && !game.finished && isPlayer && (
+									<button
+										className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
+										onClick={() => navigate(`/game/${game._id}`)}
+									>
+										Rejoin
+									</button>
+								)}
+							</li>
+						);
+					})}
 				</ul>
 			)}
 		</div>

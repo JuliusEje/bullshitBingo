@@ -8,6 +8,7 @@ require("dotenv").config();
 
 const MeetingBingoField = require("./src/models/MeetingBingoField");
 const InformaticsLectureTerm = require("./src/models/InformaticsLecutreTerm");
+const PresentationTerms = require("./src/models/PresentationTerms");
 
 const bingoRoutes = require("./src/routes/bingoRoutes");
 const authRoutes = require("./src/routes/authRoutes");
@@ -348,6 +349,41 @@ const informaticsLectureStrings = [
 	"Ich hol kurz Luft – dann weiter",
 ];
 
+const PresentationTermsStrings = [
+	"MERN",
+	"Docker",
+	"Nginx",
+	"Github",
+	"Commit-history",
+	"dev prod parity",
+	"https",
+	"flask",
+	"python",
+	"bcrypt",
+	"gehasht",
+	"Punkte",
+	"Multiplayer",
+	"Rest API",
+	"Websockets",
+	"Ärger dich Reich",
+	"Cookie Clicker",
+	"Spielfeld",
+	"Datenbanken",
+	"Production",
+	"Prototyp",
+	"Lobby",
+	"nicht implementierbar",
+	"Navbar",
+	"Bugs",
+	"unsetzbar",
+	"User System",
+	"Online Modus",
+	"Feld",
+	"Proof of Concept",
+	"MVP",
+	"Make it fast",
+];
+
 async function initializeDatabase() {
 	try {
 		await mongoose.connect(MONGO_URI, {
@@ -383,6 +419,19 @@ async function initializeDatabase() {
 		} else {
 			console.log(
 				"InformaticsLectureTerms Collection enthält bereits Daten. Überspringe Befüllung."
+			);
+		}
+		const presentationCount = await PresentationTerms.countDocuments();
+		if (presentationCount === 0) {
+			console.log(
+				"PresentationTerms Collection ist leer. Befülle mit Daten..."
+			);
+			const docs = PresentationTermsStrings.map((s) => ({ phrase: s }));
+			await PresentationTerms.insertMany(docs);
+			console.log(`${docs.length} Dokumente in PresentationTerms eingefügt.`);
+		} else {
+			console.log(
+				"PresentationTerms Collection enthält bereits Daten. Überspringe Befüllung."
 			);
 		}
 	} catch (error) {
