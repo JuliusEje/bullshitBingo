@@ -1,11 +1,11 @@
-const User = require("../models/User");
+import User from "../models/User.js";
 
 const protect = async (req, res, next) => {
 	if (req.session && req.session.userId) {
 		try {
-			const user = await User.findById(req.session.userId).select("-password"); 
+			const user = await User.findById(req.session.userId).select("-password");
 			if (user) {
-				req.user = user; 
+				req.user = user;
 				next();
 			} else {
 				res
@@ -21,4 +21,4 @@ const protect = async (req, res, next) => {
 	}
 };
 
-module.exports = protect;
+export default protect;

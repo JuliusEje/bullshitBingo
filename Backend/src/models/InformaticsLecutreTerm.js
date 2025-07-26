@@ -1,11 +1,17 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const InformaticsLectureTermSchema = new mongoose.Schema({
-    term: {
-        type: String,
-        required: true,
-        unique: true 
-    }
+	term: {
+		type: String,
+		required: true,
+		unique: true,
+	},
 });
 
-module.exports = mongoose.model('InformaticsLectureTerm', InformaticsLectureTermSchema, 'lectures');
+const InformaticsLectureTerm = mongoose.model(
+	"InformaticsLectureTerm",
+	InformaticsLectureTermSchema,
+	"lectures"
+);
+
+export default InformaticsLectureTerm;

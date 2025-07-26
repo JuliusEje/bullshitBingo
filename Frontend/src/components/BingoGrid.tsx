@@ -40,21 +40,19 @@ const BingoGrid: React.FC<BingoGridProps> = ({
 								wordBreak: "break-word",
 								whiteSpace: "pre-wrap",
 								overflowWrap: "break-word",
-								display: "flex",
-								alignItems: "center",
-								justifyContent: "center",
+								overflow: "auto", // scroll only inner content
 								textAlign: "center",
 							}}
 						/>
 					) : (
 						<button
 							className={`relative flex items-center justify-center h-20 w-20 sm:h-32 sm:w-32 border border-gray-300 rounded-lg cursor-pointer transition-colors text-center p-2 text-sm font-semibold
-                                ${
-																	crossed[index]
-																		? "bg-green-100"
-																		: "bg-gray-100 hover:bg-blue-100"
-																}
-                            `}
+                    ${
+											crossed[index]
+												? "bg-green-100"
+												: "bg-gray-100 hover:bg-blue-100"
+										}
+                `}
 							onClick={() => onFieldClick?.(index)}
 							aria-label={`Bingo field: ${field}`}
 							title={`Bingo field: ${field}`}
@@ -63,11 +61,24 @@ const BingoGrid: React.FC<BingoGridProps> = ({
 								wordBreak: "break-word",
 								whiteSpace: "pre-wrap",
 								overflowWrap: "break-word",
+								textAlign: "center",
 							}}
 							data-field={field}
 							data-index={index}
 						>
-							{field}
+							<span
+								style={{
+									width: "100%",
+									height: "100%",
+									overflow: "auto",
+									display: "flex", // use flexbox
+									alignItems: "center", // vertical centering
+									justifyContent: "center", // horizontal centering
+									textAlign: "center", // keep text centered
+								}}
+							>
+								{field}
+							</span>
 							{crossed[index] && (
 								<span className="absolute inset-0 flex items-center justify-center pointer-events-none">
 									<svg width="80%" height="80%" viewBox="0 0 100 100">

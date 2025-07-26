@@ -1,11 +1,17 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const PresentationTerms = new mongoose.Schema({
-    phrase: {
-        type: String,
-        required: true,
-        unique: true
-    }
+const PresentationTermsSchema = new mongoose.Schema({
+	phrase: {
+		type: String,
+		required: true,
+		unique: true,
+	},
 });
 
-module.exports = mongoose.model('PresentationTerms', PresentationTerms, 'presentation');
+const PresentationTerms = mongoose.model(
+	"PresentationTerms",
+	PresentationTermsSchema,
+	"presentation"
+);
+
+export default PresentationTerms;

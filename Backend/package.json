@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "webpack --config webpack.dev.cjs",
+    "build": "webpack --config webpack.prod.cjs"
   },
   "jest": {
     "testEnvironment": "node"
@@ -15,15 +17,19 @@
     "bcryptjs": "^3.0.2",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
-    "mongodb": "^6.17.0"
+    "mongodb": "^6.17.0",
+    "path": "^0.12.7"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "esbuild": "^0.25.8",
     "jest": "^30.0.4",
     "mongodb-memory-server": "^10.1.4",
     "mongoose": "^8.16.3",
     "supertest": "^7.1.1"
-  }
+  },
+  "type": "module"
 }
