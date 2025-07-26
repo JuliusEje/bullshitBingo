@@ -1,18 +1,20 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const connectDB = require("./src/config/db");
-require("dotenv").config();
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import connectDB from "./src/config/db.js";
+import dotenv from "dotenv";
 
-const MeetingBingoField = require("./src/models/MeetingBingoField");
-const InformaticsLectureTerm = require("./src/models/InformaticsLecutreTerm");
-const PresentationTerms = require("./src/models/PresentationTerms");
+dotenv.config();
 
-const bingoRoutes = require("./src/routes/bingoRoutes");
-const authRoutes = require("./src/routes/authRoutes");
-const gameRoutes = require("./src/routes/gameRoutes");
+import MeetingBingoField from "./src/models/MeetingBingoField.js";
+import InformaticsLectureTerm from "./src/models/InformaticsLecutreTerm.js";
+import PresentationTerms from "./src/models/PresentationTerms.js";
+
+import bingoRoutes from "./src/routes/bingoRoutes.js";
+import authRoutes from "./src/routes/authRoutes.js";
+import gameRoutes from "./src/routes/gameRoutes.js";
 
 const app = express();
 

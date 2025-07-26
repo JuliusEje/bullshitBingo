@@ -1,11 +1,17 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const MeetingBingoFieldSchema = new mongoose.Schema({
-    phrase: {
-        type: String,
-        required: true,
-        unique: true 
-    }
+	phrase: {
+		type: String,
+		required: true,
+		unique: true,
+	},
 });
 
-module.exports = mongoose.model('MeetingBingoField', MeetingBingoFieldSchema, 'meetings');
+const MeetingBingoField = mongoose.model(
+	"MeetingBingoField",
+	MeetingBingoFieldSchema,
+	"meetings"
+);
+
+export default MeetingBingoField;

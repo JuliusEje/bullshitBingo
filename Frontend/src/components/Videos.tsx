@@ -5,7 +5,7 @@ interface VideosProps {
 }
 
 const Videos: React.FC<VideosProps> = ({ videos }) => (
-	<div className="absolute inset-0 w-screen h-screen grid grid-cols-5 grid-rows-2 z-[1]">
+	<div className="inset-0 w-screen h-screen grid grid-cols-5 grid-rows-2 z-[1]">
 		{videos.map((src, idx) => (
 			<div
 				key={src}
@@ -13,7 +13,7 @@ const Videos: React.FC<VideosProps> = ({ videos }) => (
 			>
 				<iframe
 					className="w-[120%] h-[120%] object-cover border-none -ml-[10%]"
-					src={`${src}?autoplay=1&controls=0&modestbranding=1&rel=0`}
+					src={`${src}&autoplay=1&controls=0&modestbranding=1&rel=0`}
 					title={`YouTube video ${idx + 1}`}
 					frameBorder="0"
 					allow="autoplay"

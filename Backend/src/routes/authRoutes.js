@@ -1,8 +1,7 @@
-// routes/auth.js
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const User = require("../models/User");
-const protect = require("../middleware/authMiddleWare"); 
+import User from "../models/User.js";
+import protect from "../middleware/authMiddleWare.js";
 
 // @desc    Registriere einen neuen Benutzer
 // @route   POST /api/auth/register
@@ -24,12 +23,10 @@ router.post("/register", async (req, res) => {
 		});
 
 		req.session.userId = user._id;
-		res
-			.status(201)
-			.json({
-				message: "Benutzer erfolgreich registriert",
-				username: user.username,
-			});
+		res.status(201).json({
+			message: "Benutzer erfolgreich registriert",
+			username: user.username,
+		});
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Serverfehler" });
@@ -73,7 +70,7 @@ router.post("/logout", protect, (req, res) => {
 		if (err) {
 			return res.status(500).json({ message: "Fehler beim Abmelden" });
 		}
-		res.clearCookie("connect.sid"); 
+		res.clearCookie("connect.sid");
 		res.json({ message: "Erfolgreich abgemeldet" });
 	});
 });
@@ -84,7 +81,7 @@ router.post("/logout", protect, (req, res) => {
 router.get("/me", protect, async (req, res) => {
 	try {
 		res.json({
-			_id: req.user._id, 
+			_id: req.user._id,
 			username: req.user.username,
 			points: req.user.points ?? 0,
 		});
@@ -94,4 +91,4 @@ router.get("/me", protect, async (req, res) => {
 	}
 });
 
-module.exports = router;
+export default router;
