@@ -6,7 +6,7 @@ services:
     container_name: mongo
     restart: always
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongo-data:/data/db
 
@@ -15,7 +15,7 @@ services:
     container_name: backend
     restart: always
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       MONGO_URI: ${MONGO_URI}
       PORT: ${PORT}
@@ -29,7 +29,7 @@ services:
     container_name: frontend
     restart: always
     ports:
-      - "7456:7456"
+      - "127.0.0.1:7456:7456"
     depends_on:
       - backend
 
